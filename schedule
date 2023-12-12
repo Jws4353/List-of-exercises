@@ -1,0 +1,55 @@
+import random
+
+def generate_workout_schedule(workouts, rest_days, previous_schedule=None):
+    schedule = []
+
+    # Calculate the number of workout days
+    workout_days = 7 - rest_days
+
+    # Distribute rest days throughout the week
+    rest_indices = random.sample(range(7), rest_days)
+    rest_indices.sort()
+
+    workout_index = 0
+    if previous_schedule:
+        # Find the last workout in the previous schedule
+        last_workout = None
+        for day in reversed(previous_schedule):
+            if "Rest" not in day:
+                last_workout = day
+                break
+
+        if last_workout:
+            workout_index = (workouts.index(last_workout) + 1) % len(workouts)
+
+    # Initialize schedule with workout days
+    for i in range(7):
+        if i not in rest_indices:
+            workout = workouts[workout_index]
+            schedule.append(workout)
+            workout_index = (workout_index + 1) % len(workouts)
+        else:
+            schedule.append("Rest Day")
+
+    return schedule
+
+def print_weekly_schedule(schedule, days_per_week):
+    for i in range(0, len(schedule), days_per_week):
+        print("\nWeek {}: ".format(i // days_per_week + 1))
+        for j in range(days_per_week):
+            day = schedule[i + j]
+            print("Day {}: {}".format(i + j + 1, day))
+
+if __name__ == "__main__":
+    workouts = ["Push Workout", "Pull Workout", "Leg Workout"]
+
+    rest_days = int(input("How many rest days do you want in a week? "))
+    total_weeks = int(input("How many weeks do you want to generate schedules for? "))
+
+    schedule = []
+
+    for week in range(total_weeks):
+        schedule.extend(generate_workout_schedule(workouts, rest_days, schedule))
+
+    print("\nWeekly Workout Schedule:")
+    print_weekly_schedule(schedule, days_per_week=7)
